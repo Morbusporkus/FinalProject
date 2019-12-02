@@ -1,0 +1,661 @@
+//Hole In The Wall Prototype;
+//By Skyler Fetter
+// GGS462 Final Project
+
+
+head
+  meta(charset = "UTF-8")
+  meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+  link(href="https://fonts.googleapis.com/css?family=Righteous&display=swap" rel="stylesheet")
+  link(rel='stylesheet' href='https://unpkg.com/leaflet@1.5.1/dist/leaflet.css' integrity='sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==' crossorigin='')
+  link(rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css")
+  link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css")
+  link(rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css")
+  link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css")
+
+  // Make sure you put this AFTER Leaflet's CSS
+  script(src='https://unpkg.com/leaflet@1.5.1/dist/leaflet.js' integrity='sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==' crossorigin='')
+  script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js")
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js")
+  script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js")
+  //https://github.com/makinacorpus/Leaflet.GeometryUtil NOTE: this is for measuring distance between each point!
+  script(src="https://npmcdn.com/leaflet-geometryutil")
+  
+  title(Hole in the Wall)
+ 
+ 
+ 
+// so the name, is used to create the json data, i think for the server
+// where as the id is really just for the name also, might want to have a drop down for genres? 
+// i think that might work, but I have a feeling it would start getting confusing? Maybe change it from 
+
+
+style
+  include backgroundv2.css
+  
+// OK SO <br> is break and all that
+body
+    // this is all for the nav bar, I need to fix some errors with the the adding
+    // and I need to get the seach function to work (might just have it query, take some code from codepen homeworks)
+    nav(class = 'navbar navbar-inverse')
+        div(class = 'container-fluid')
+            div(clas = 'navbar-header')
+                a(id = 'title' class = 'navbar-brand' href = "#") Hole In The Wall
+            
+            ul(class = 'nav navbar-nav')
+                form(class = 'navbar-form navbar-left')
+                    div(class = "input-group")
+                        input(id = 'srch' type = 'text' class = 'form-control' placeholder = 'Search')
+                        div(class = 'input-group-btn')
+                            button(id = 'srch_btn' type ='button' class = 'btn btn-default navbar-btn')
+                                i(class = "glyphicon glyphicon-search")
+                button(id = 'add_btn' type = "button" class = "navbar-btn" data-toggle = 'collapse' data-target = '#add') Add Restaurant
+                div(id = 'add' class="collapse")
+                  form(id = 'update')
+                    div.form-group
+                        input(id = "rest", name ='name', value = 'Restaurant Name', type ='text')
+                    .form-group
+                        select(id = 'food_selct' name = 'food_type')
+                            option(value = 'American') American
+                            option(value = 'Chinese') Chinese
+                            option(value = 'Hispanic') Hispanic
+                            option(value = 'Korean') Korean
+                            option(value = 'Italian') Italian
+                        input(id = 'lat', name = 'my_lat', type = 'hidden', value = '')
+                        input(id = 'lng', name = 'my_lng', type = 'hidden', value = '')
+                    br
+                    .form-group
+                      // so if i need to manage all of the radio toolbar, 
+                      div(class = 'star_rate')
+                        
+                        input(type = 'radio' name = 'star_rate' id = 'star5' value = 5)
+                        label(id = 's5'  for = 'star5') 
+                          span(class= 'fa fa-star')
+
+                        input(type = 'radio' name = 'star_rate' id = 'star4' value = 4)
+                        label(id = 's4' for = 'star4') 
+                          span(class= 'fa fa-star')
+
+                       
+                        input(type = 'radio' name = 'star_rate' id = 'star3' value = 3)
+                        label(id = 's3' for = 'star3') 
+                          span(class= 'fa fa-star')
+
+                        
+                        input(type = 'radio' name = 'star_rate' id = 'star2' value = 2)
+                        label(id = 's2' for = 'star2') 
+                          span(class= 'fa fa-star')
+  
+                        
+                        input(type = 'radio' name = 'star_rate' id = 'star1' value = 1)
+                        label(id = 's1' for = 'star1') 
+                          span(class= 'fa fa-star')
+                      .form-group
+                        input(id = "sub",value = 'Submit!', type = 'button') 
+            
+    div(class = 'container-fluid')
+      div(class = 'row')
+        //div(class= 'col-xs-2 sidenav' style = 'background-color: grey')//
+         
+        div(class = 'col-xs-8 text-center' )
+            #map(style='width: 95vw; height: 48%;')
+        //div(class = 'col-xs-2 sidenav' style = 'background-color: grey')
+         
+    footer(class ='container-fluid text-center')
+        div(id = 'upper' class = 'collapse')
+          p(id = 'rev_name')
+          form(id = 'rate_update')
+            div(class = 'star_rate2', class = 'container-fluid text-center')
+              input(type = 'radio' name = 'star_rate2' id = 'star5_2' value = 5)
+              label(id = 's5_2'  for = 'star5_2') 
+                span(class= 'fa fa-star')
+              
+              input(type = 'radio' name = 'star_rate2' id = 'star4_2' value = 4)
+              label(id = 's4_2' for = 'star4_2') 
+                span(class= 'fa fa-star')
+
+              input(type = 'radio' name = 'star_rate2' id = 'star3_2' value = 3)
+              label(id = 's3_2' for = 'star3_2') 
+                span(class= 'fa fa-star')
+
+              input(type = 'radio' name = 'star_rate2' id = 'star2_2' value = 2)
+              label(id = 's2_2' for = 'star2_2') 
+                span(class= 'fa fa-star')
+
+              input(type = 'radio' name = 'star_rate2' id = 'star1_2' value = 1)
+              label(id = 's1_2' for = 'star1_2') 
+                span(class= 'fa fa-star')
+
+              
+              
+            .form-group
+                input(id = "sub2",value = 'Submit!', type = 'submit') 
+
+
+                        
+                
+                    
+                
+                   
+             
+                    
+            
+                
+
+ 
+    
+
+
+// this is creating the map
+script.
+  <!-- webmap-->
+ 
+  // ok so my  data is already a geoJson, great! makes this a lot easier on me then
+  var Resturant = !{JSON.stringify(jsonData)};
+  var holder 
+  var map = L.map("map")
+  
+  map.locate({setView:true,
+        maxZoom: 40,
+        watch: true,
+        enableHighAccuracy: true})
+
+  var Stamen_Toner = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}{r}.{ext}', {
+  attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  subdomains: 'abcd',
+  minZoom: 0,
+  maxZoom: 40,
+  ext: 'png'
+ 
+  }).addTo(map);
+  // trying to learn how to "filter" the data, so that people can look at it in all that
+  // for some reason, f3 is my "food genre container?"
+  // NOTE: I can add whatever into the bindPopup, so maybe I can add a script or something?
+  // NOTE: going to want to seperate the things based on reviews with layer control.
+  var circle_options = {
+    radius: 8,
+    fillColor: 'red',
+    color: 'red',
+    weight: 1,
+    opacity: 1,
+    fillOpacity:1
+  }
+  var data_layer = new L.layerGroup();
+  data_layer.addTo(map)
+  var oneStar = []
+  //var myRenderer = L.canvas({padding: 0.5})
+  //NOTE: test, going to see I can just get a certain type; This works, soooooooo, going to be really easy!
+  // This is going to look really really uggly. Dont wory about fixing it for performance sake, just get it out the door. 
+  // I will create a layer for each review and then add it to the data_layer
+
+    // the rest_layer is just for calculations in distance and all that
+  rest_layer = L.geoJSON(Resturant, {filter:function(feature, layer){
+        return feature.properties.f4;},
+        onEachFeature:function(feature,layer) {
+        layer.bindPopup("<h2>"+feature.properties.f3+"</h2>" + '<p>' + feature.properties.f4 +"</p>" + "<div id ='testing'> </div>");
+        
+     }
+       });
+    //This is all for seperating the values resturants based on review scores. It is not pretty,as I am running out of time and I need to get it done
+  OneReview = L.geoJSON(Resturant, {filter:function(feature, layer){
+        return feature.properties.f2==1;},
+        onEachFeature:function(feature,layer) {
+        layer.bindPopup("<h2>"+feature.properties.f3+"</h2>" + '<p>' + feature.properties.f4 +"</p>" + "<div id ='testing'> </div>");
+        
+     },pointToLayer:function(feature,latlng){
+       if(feature.properties.f2 == 1){
+        return L.circleMarker(latlng, {color:'#d7191c'})
+       }
+        } 
+       }).addTo(data_layer);
+
+    TwoReview = L.geoJSON(Resturant, {filter:function(feature, layer){
+        return feature.properties.f2==2;},
+        onEachFeature:function(feature,layer) {
+        layer.bindPopup("<h2>"+feature.properties.f3+"</h2>" + '<p>' + feature.properties.f4 +"</p>" + "<div id ='testing'> </div>");
+        
+     },pointToLayer:function(feature,latlng){
+       if(feature.properties.f2 == 2){
+        return L.circleMarker(latlng, {color:'#fdae61'})
+       }
+       } 
+       }).addTo(data_layer);
+
+    ThreeReview = L.geoJSON(Resturant, {filter:function(feature, layer){
+        return feature.properties.f2==3;},
+        onEachFeature:function(feature,layer) {
+        layer.bindPopup("<h2>"+feature.properties.f3+"</h2>" + '<p>' + feature.properties.f4 +"</p>" + "<div id ='testing'> </div>");
+        
+     },pointToLayer:function(feature,latlng){
+       if(feature.properties.f2 == 3){
+        return L.circleMarker(latlng, {color:'#ffffbf'})
+       }
+        } 
+       }).addTo(data_layer);
+
+    FourReview = L.geoJSON(Resturant, {filter:function(feature, layer){
+        return feature.properties.f2==4;},
+        onEachFeature:function(feature,layer) {
+        layer.bindPopup("<h2>"+feature.properties.f3+"</h2>" + '<p>' + feature.properties.f4 +"</p>" + "<div id ='testing'> </div>");
+        
+     },pointToLayer:function(feature,latlng){
+       if(feature.properties.f2 == 4){
+        return L.circleMarker(latlng, {color:'#abd9e9'})
+       }} 
+       }).addTo(data_layer);
+
+    FiveReview = L.geoJSON(Resturant, {filter:function(feature, layer){
+        return feature.properties.f2==5;},
+        onEachFeature:function(feature,layer) {
+        layer.bindPopup("<h2>"+feature.properties.f3+"</h2>" + '<p>' + feature.properties.f4 +"</p>" + "<div id ='testing'> </div>");
+        
+     },pointToLayer:function(feature,latlng){
+       if(feature.properties.f2 == 5){
+        return L.circleMarker(latlng, {color:'#2c7bb6'})
+       }} 
+       }).addTo(data_layer);
+    
+  // custom marker I made. I am really enjoying the whole process for this. Taking art at logic to make something cool. 
+  //It's why I got into GIS and the Geographyfield
+  var orange = L.icon({
+    iconUrl:'Location_point.svg',
+    iconSize: [25,30],
+    iconAnchor: [20,20]
+
+  });
+  
+  const coordinates_array = rest_layer.getLayers().map(l => l.feature.geometry.coordinates)
+  // i had to create a switching array since the lat long values were switched, this needs to be fixed
+  // Also .forEach is more efficent than a for loop
+ coordinates_array.forEach(function(item, index){
+   holder = [item[1],item[0]]
+   coordinates_array[index] = holder
+
+ })
+ 
+
+  console.log(coordinates_array)
+
+  var point_overlay = {One: OneReview, Two: TwoReview, Three: ThreeReview, Four: FourReview, Five: FiveReview};
+  
+  var layerControl = L.control.layers(null, point_overlay).addTo(map)
+ 
+ // so this is how it works, apperently you can take the event "e" and ask for the source of the marker
+ // this allows you to to acesses any of the variables that the feature has. 
+ // known bug: if you select another popup the reviews will not show for it
+
+  map.on('popupopen', function(e){
+   var marker = e.popup._source.feature.properties.f2;
+   console.log(e.popup._source.feature.geometry.coordinates)
+   if(marker == 1){
+    $("#testing").append("<span class = 'fa fa-star checked'></span><span class = 'fa fa-star'></span><span class = 'fa fa-star'></span><span class = 'fa fa-star'></span><span class = 'fa fa-star'></span>")
+   }
+   if(marker == 2){
+    $("#testing").append("<span class = 'fa fa-star checked'></span><span class = 'fa fa-star checked'></span><span class = 'fa fa-star'></span><span class = 'fa fa-star'></span><span class = 'fa fa-star'></span>")
+   }
+   if(marker == 3){
+    $("#testing").append("<span class = 'fa fa-star checked'></span><span class = 'fa fa-star checked'></span><span class = 'fa fa-star checked'></span><span class = 'fa fa-star'></span><span class = 'fa fa-star'></span>")
+   }
+   if(marker == 4){
+    $("#testing").append("<span class = 'fa fa-star checked'></span><span class = 'fa fa-star checked'></span><span class = 'fa fa-star checked'></span><span class = 'fa fa-star checked'></span><span class = 'fa fa-star'></span>")
+   }
+   if(marker == 5){
+    $("#testing").append("<span class = 'fa fa-star checked'></span><span class = 'fa fa-star checked'></span><span class = 'fa fa-star checked'></span><span class = 'fa fa-star checked'></span><span class = 'fa fa-star checked'></span>")
+   }
+  
+   
+   
+    
+    })
+  
+  var trackerGroup = new L.layerGroup() 
+  var cont = new Array();
+  let foo = []
+  
+  // error handeling I stole from leaflet //
+  // so it seems that the ID starts at 1442
+  function onLocationFound(e) {
+    //note will need to at this to the lat long for location aquistion
+    //I think that the array.lenght give me a non 0 to x value
+      
+      var loc = e.latlng
+      var lat = e.latlng.lat
+      var long = e.latlng.lng
+      var index = cont.length
+      var x
+      console.log(lat,long)
+      //NOTE: during test before submission noticed that there was a problem with adding a value doing a hotfix
+      //console.log("before array pop: " + index)
+      //document.getElementById('lat').value = lat
+      //document.getElementById('lng').value = long
+      var tracker = L.marker(loc,{icon: orange}, {draggable: true})
+      trackerGroup.addLayer(tracker)
+      id = trackerGroup.getLayerId(tracker)
+      
+      cont = trackerGroup.getLayers()
+      // this gives me active gps tracking, sort of removes the previous point so that there is not a trail.
+      map.addLayer(cont[cont.length-1])
+      if(cont.length > 1){
+        map.addLayer(cont[cont.length-1])
+        map.removeLayer(cont[cont.length-2])
+        
+      }
+     
+     
+    
+   
+    //so going to have to use distance methods to make it work, no great, but it should be fine
+
+    // NOTE: 65 meters is threshhold NOTE maybe add a side thing that shows local resturants and all that. (bet better than what have I have)
+    var sfsf = rest_layer.getLayers()
+    var M = tracker.getLatLng()
+     
+    var coords_switch = []
+   coordinates_array.forEach(function(item, index){
+    const thresh = 65
+    
+    // calulate distance btween current location and coordinates
+    var distance_cal = M.distanceTo(item)
+    if(distance_cal <= thresh){
+      // adds all of the points that are within the range to an array
+      coords_switch.push([item[1],item[0]])
+   }})
+   // compares the coordinates to each of the local resturants
+    sfsf.forEach(function(item2,index2){
+        console.log()
+        coords_switch.forEach(function(item3,index3){
+          if(item2.feature.geometry.coordinates[0] == item3[0]&&item2.feature.geometry.coordinates[1] == item3[1]){
+            item2.openPopup()
+            coords_switch = []
+        }
+        })
+   })
+
+       
+ 
+     
+    
+  }
+  
+
+  map.on('locationfound', onLocationFound)
+  
+  // this scales location point
+  map.on('zoomend', function(){
+    var resized = L.Icon.extend({
+      options: {
+        iconSize: [20*(map.getZoom()+2), 20*(map.getZoom()+2)],
+        iconAnchor: [20,20]
+      }
+    })
+  })
+  const my_ramp = ["#d7191c","#fdae61","#ffffbf","#abd9e9","#2c7bb6"]
+  var legend = L.control({position: 'bottomleft'})
+  // leaflet method for creating the legend
+  function getColor(d) {
+    return d == "One Star" ? "#d7191c" : d == 'Two Star' ? "#fdae61" : d == 'Three Star'  ? "#ffffbf" :d == 'Four Star'  ? "#abd9e9" :d == 'Five Star'  ? "#2c7bb6":"#ff7f00";
+  }
+  
+   
+          
+  // creating the legend, took this from stackoverflow...the GIS variant      
+  legend.onAdd = function(map){
+    var div = L.DomUtil.create('div', 'info legend')
+    labels = ['<strong>Reviews<strong>']
+    categories = ['One Star','Two Star','Three Star','Four Star','Five Star']
+    categories.forEach(function(item3,index3){
+      console.log(my_ramp[index3])
+      //console.log('<i class = "circle" style = "background:'+ my_ramp[index3] + '"></i>')
+      div.innerHTML += labels.push('<i class = "circle" style = "background:'+ getColor(item3) + '"></i>'+(item3 ? item3 : '+'))})
+    div.innerHTML = labels.join('<br>')
+    return div
+    };
+    legend.addTo(map)
+  
+
+
+ 
+ 
+ //geolocation NOTE: I think this is causing some hard resets. I will have to move everything around
+// THIS IS FROM A PREVIOUS VERSION, NOTICED DATABASE ERROR ----HOTFIX
+// Get current postion script for database only, that is what this
+script.
+ if (navigator.geolocation) 
+ 
+    navigator.geolocation.getCurrentPosition(function(position)
+    {
+    
+    var lat = position.coords.latitude
+    var long = position.coords.longitude 
+    document.getElementById('lat').value = lat
+    document.getElementById('lng').value = long
+    
+    })
+  else 
+  
+    alert("Browser too old for location data")
+// toggles genre
+
+
+  
+// creating ajax script for submitting varibles. Turns out that xhttml and all that
+// is wrapped up in in ajax/jquery, what I did find, if I wanted to tailor make https request,
+// it would be better to custom make request with xhttml, however I dont have the time for that.
+// maybe one day though
+script.
+  // So i was stupid as I was wondering why JSON.parse was not working, it was because of the NODE.js bodyparse already set to JSON
+  // i dont know if this is acutally being used will look further into it.
+     $('#rest').on('click', function(){
+       $('#rest').val('');
+     })
+     $('#sub').on('click', function(){
+       
+        // so you can traverse radios, good to know, thanks stack overflow
+        var radio_holder = $("input[name='star_rate']:checked").val()
+    
+        console.log(radio_holder)
+        var rest_data = {};
+        rest_data.name =  $('#rest').val();
+        rest_data.lat = $('#lat').val();
+        rest_data.lng = $('#lng').val();
+        rest_data.food_type = $('#food_selct').val();
+        rest_data.review = radio_holder
+        console.log(rest_data)
+
+        $.ajax({
+        url: 'http://localhost:8000/update',
+        type: 'POST',
+        data: JSON.stringify(rest_data),
+        contentType: 'application/json',
+        dataType: 'json',
+        success: function(rest_data){
+          console.log(rest_data)
+        }
+      })
+    })
+// closing side nav
+script.
+    function closeNav(){
+        document.getElementById('rest_sideNav').style.width = '0';
+        
+    }
+
+// shows the rating system on leaflet popup click and new reviews submissions
+script.
+ map.on('popupopen', function(e){
+   var update_names = e.popup._source.feature.properties.f3
+   // f1 is the id i think
+   var update_id = e.popup._source.feature.properties.f1
+   $("#rev_name").text(update_names);
+   $('#upper').collapse("show");
+   $('#sub2').on('click', function(){
+       
+        // so you can traverse radios, good to know, thanks stack overflow
+        var update_radio = $("input[name='star_rate2']:checked").val()
+        var update_data = {};
+        console.log(update_radio)
+        update_data.id =  update_id;
+        update_data.review = update_radio;
+        
+
+        $.ajax({
+        url: 'http://localhost:8000/submission',
+        type: 'POST',
+        data: JSON.stringify(update_data),
+        contentType: 'application/json',
+        dataType: 'json',
+        success: function(update_data){
+          console.log(update_data)
+        }
+      })
+    })
+
+ })
+// collapses the leaflet popup once it closes
+script.
+   map.on('popupclose', function(e){
+   $('#upper').collapse("hide");
+ })
+
+
+// this going to be the search function
+script.
+  $('#srch_btn').on('click', function(){
+
+    search_val = $('#srch').val();
+    
+    
+    if(search_val.length == 0){
+        alert('Nothing to search')
+     
+    }
+    else{
+    data_layer.removeLayer(OneReview)
+    data_layer.removeLayer(TwoReview)
+    data_layer.removeLayer(ThreeReview)
+    data_layer.removeLayer(FourReview)
+    data_layer.removeLayer(FiveReview)
+    console.log(point_overlay.One)
+    layerControl.remove(map)
+    
+    
+    
+    
+  
+    
+    // Note: string matching will work for now however, it might not be fool proof for ALL cases
+    // One Star review
+    OneReview = L.geoJSON(Resturant, {filter:function(feature, layer){
+        // this is for searching by name
+        if(feature.properties.f3.toLowerCase().match(search_val.toLowerCase())){
+            return feature.properties.f3.toLowerCase();
+        }
+        // this is for searching by food type: 
+        else if(feature.properties.f4.toLowerCase().match(search_val.toLowerCase())){
+            return feature.properties.f3;
+        }
+    },
+    onEachFeature:function(feature,layer) {
+     layer.bindPopup("<h2>"+feature.properties.f3+"</h2>" + '<p>' + feature.properties.f4 +"</p>" + "<div id ='testing'> </div>");
+     },pointToLayer:function(feature,latlng){
+       if(feature.properties.f2 == 1){
+        return L.circleMarker(latlng, {color:'#d7191c'})
+       } } 
+      }).addTo(data_layer);
+    //TwoStar
+    TwoReview = L.geoJSON(Resturant, {filter:function(feature, layer){
+        // this is for searching by name
+        if(feature.properties.f3.toLowerCase().match(search_val.toLowerCase())){
+            return feature.properties.f3.toLowerCase();
+        }
+        // this is for searching by food type: 
+        else if(feature.properties.f4.toLowerCase().match(search_val.toLowerCase())){
+            return feature.properties.f3;
+        }
+    },
+    onEachFeature:function(feature,layer) {
+     layer.bindPopup("<h2>"+feature.properties.f3+"</h2>" + '<p>' + feature.properties.f4 +"</p>" + "<div id ='testing'> </div>");
+     },pointToLayer:function(feature,latlng){
+       if(feature.properties.f2 == 2){
+        return L.circleMarker(latlng, {color:'#fdae61'})
+       } } 
+      }).addTo(data_layer);
+
+      ThreeReview = L.geoJSON(Resturant, {filter:function(feature, layer){
+        // this is for searching by name
+        if(feature.properties.f3.toLowerCase().match(search_val.toLowerCase())){
+            return feature.properties.f3.toLowerCase();
+        }
+        // this is for searching by food type: 
+        else if(feature.properties.f4.toLowerCase().match(search_val.toLowerCase())){
+            return feature.properties.f3;
+        }
+    },
+    onEachFeature:function(feature,layer) {
+     layer.bindPopup("<h2>"+feature.properties.f3+"</h2>" + '<p>' + feature.properties.f4 +"</p>" + "<div id ='testing'> </div>");
+     },pointToLayer:function(feature,latlng){
+       if(feature.properties.f2 == 3){
+        return L.circleMarker(latlng, {color:'#ffffbf'})
+       } } 
+      }).addTo(data_layer);
+
+    FourReview = L.geoJSON(Resturant, {filter:function(feature, layer){
+        // this is for searching by name
+        if(feature.properties.f3.toLowerCase().match(search_val.toLowerCase())){
+            return feature.properties.f3.toLowerCase();
+        }
+        // this is for searching by food type: 
+        else if(feature.properties.f4.toLowerCase().match(search_val.toLowerCase())){
+            return feature.properties.f3;
+        }
+    },
+    onEachFeature:function(feature,layer) {
+     layer.bindPopup("<h2>"+feature.properties.f3+"</h2>" + '<p>' + feature.properties.f4 +"</p>" + "<div id ='testing'> </div>");
+     },pointToLayer:function(feature,latlng){
+       if(feature.properties.f2 == 4){
+        return L.circleMarker(latlng, {color:'#abd9e9'})
+       } } 
+      }).addTo(data_layer);
+
+    FiveReview = L.geoJSON(Resturant, {filter:function(feature, layer){
+        // this is for searching by name
+        if(feature.properties.f3.toLowerCase().match(search_val.toLowerCase())){
+            return feature.properties.f3.toLowerCase();
+        }
+        // this is for searching by food type: 
+        else if(feature.properties.f4.toLowerCase().match(search_val.toLowerCase())){
+            return feature.properties.f3;
+        }
+    },
+    onEachFeature:function(feature,layer) {
+     layer.bindPopup("<h2>"+feature.properties.f3+"</h2>" + '<p>' + feature.properties.f4 +"</p>" + "<div id ='testing'> </div>");
+     },pointToLayer:function(feature,latlng){
+       if(feature.properties.f2 == 5){
+        return L.circleMarker(latlng, {color:'#2c7bb6'})
+       } } 
+      }).addTo(data_layer);
+    // So the "point_overlay" is a really an object, and in javascript this means that I can change values by access the attribute
+    // so for this filter, i don't even need to add remove, i think. Just change the filter
+    point_overlay.One = OneReview
+    point_overlay.Two = TwoReview
+    point_overlay.Three = ThreeReview
+    point_overlay.Four = FourReview
+    point_overlay.Five = FiveReview
+
+    
+    layerControl = L.control.layers(null, point_overlay).addTo(map)
+    //console.log(point_overlay.One)
+    
+    }//this is the else end section
+  })
+// going to have the marker point open up if the gps point is whithin a certain distance of antother point
+// based on certain conditions
+
+   
+  
+
+  
+
+
+
+

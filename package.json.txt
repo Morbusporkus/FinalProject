@@ -1,0 +1,9 @@
+{
+    "name": "mapping_test",
+    "main": "index.js",
+    "dependencies": {
+        "express": "~4.0.0",
+	"pg" : "*",
+	"url" : "*"
+    }
+}
