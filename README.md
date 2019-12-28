@@ -12,11 +12,11 @@ On server update it will then create a view from two joined tables, calculate re
 
 [Searching for a restaurant](./Search_function.gif)
 
-The search function is rudamentory although it can figure out whether or not the query is either for the name or cuisine. This is all done on the front end instead of hitting the database for the new infor
+The search function is rudamentory although it can figure out whether or not the query is either for the name or cuisine. This is all done on the front end instead of hitting the database for the new info. Users can also filter by reviews as well
 
-[popup and filters](./click.gif)
+[popup](./click.gif)
 
-Clicking on a popup will show you the name, cuisine, and reviews. You can also filter by reviews as well. When clicking on a location a dropup will show and user can add a review to it. Note: this has a bug that I need to fix, it will add multiple reviews to it. I think this is an issue with the ajax call and the form tag in my html/pug
+Clicking on a popup will show you the name, cuisine, and reviews. You can also filter by reviews as well. When clicking on a location a dropup will show and user can add a review to it. NOTE: this has a bug that I need to fix, it will add multiple reviews to it. I think this is an issue with the ajax call and the form tag in my html/pug
 
 
 
