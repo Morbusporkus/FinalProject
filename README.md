@@ -10,7 +10,7 @@ Aspects of the web-app
 This takes the gps location of the user along with a review, name, and cuisine style, and sends it to the database for storage.
 On server update it will then create a view from two joined tables, calculate review averages and send that as a GeoJSON to the leaflet map.
 
-[Searching for a restaurant} (./Search_function.gif)
+[Searching for a restaurant](./Search_function.gif)
 
 The search function is rudamentory although it can figure out whether or not the query is either for the name or cuisine. This is all done on the front end instead of hitting the database for the new infor
 
