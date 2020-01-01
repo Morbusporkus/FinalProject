@@ -7,16 +7,18 @@ I have to setup my ngrok web portal for it work and server. Feel Free to message
 Aspects of the web-app
 
 [Adding a restaurant](./adding.gif)
-This takes the gps location of the user along with a review, name, and cuisine style, and sends it to the database for storage.
-On server update it will then create a view from two joined tables, calculate review averages and send that as a GeoJSON to the leaflet map.
+This takes the GPS location of the user along with a review, name, and cuisine style, and sends it to the database for storage.
+On server update, it will then create a view from two joined tables, calculate review averages and send that as a GeoJSON to the leaflet map.
+
 
 [Searching for a restaurant](./Search_function.gif)
 
-The search function is rudamentory although it can figure out whether or not the query is either for the name or cuisine. This is all done on the front end instead of hitting the database for the new info. Users can also filter by reviews as well
+The search function is rudimentary, although it can figure out whether or not the query is either for the name or cuisine. This is all done on the front end instead of hitting the database for the new info. Users can also filter by reviews as well
+
 
 [popup](./click.gif)
 
-Clicking on a popup will show you the name, cuisine, and reviews. You can also filter by reviews as well. When clicking on a location a dropup will show and user can add a review to it. NOTE: this has a bug that I need to fix, it will add multiple reviews to it. I think this is an issue with the ajax call and the form tag in my html/pug
+Clicking on a popup will show you the name, cuisine, and reviews. You can also filter by reviews as well. When clicking on a location, a drop-up will show, and a user can add a review to it. NOTE: this has a bug that I need to fix; it will add multiple reviews to it. I think this is an issue with the ajax call and the form tag in my html/pug
 
 
 
