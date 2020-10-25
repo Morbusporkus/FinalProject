@@ -32,7 +32,7 @@ const pool = new pg.Pool(
 	user: "postgres",
 	host: "localhost",
 	database: "resturant_locations",
-	password: "Scionman1995",
+	password: "",
     port: '5432',
     connectionLimit :10
 }
@@ -43,7 +43,7 @@ const client = new Client(
 	user: "postgres",
 	host: "localhost",
 	database: "resturant_locations",
-	password: "Scionman1995",
+	password: "",
 	port: '5432'
 }
 );
